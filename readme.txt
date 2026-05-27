@@ -29,8 +29,8 @@ A Python project that uses your Mac's built-in camera to detect and recognize ob
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/ramiroulunque/object_detection.git
+   cd object_detection
    ```
 
 2. **Install dependencies**
