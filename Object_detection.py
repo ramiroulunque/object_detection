@@ -33,6 +33,7 @@ import threading
 import numpy as np
 from ultralytics import YOLO
 
+
 # ── Config ────────────────────────────────────────────────────────────────────
 CAMERA_INDEX   = 0              # Mac only: 0 = built-in camera
 CONFIDENCE     = 0.45           # Min confidence threshold (0–1)
@@ -45,6 +46,7 @@ ALERT_COOLDOWN = 5              # Seconds between alerts (avoids spam)
 FRAME_WIDTH    = 640            # Reduced for Pi performance
 FRAME_HEIGHT   = 480
 STREAM_PORT    = 5000           # Pi streaming port
+PROCESS_EVERY_N_FRAMES = 2   # process 1 out of every 2 frames
 # ─────────────────────────────────────────────────────────────────────────────
 
 IS_PI = platform.machine() in ("aarch64", "armv7l")
@@ -186,41 +188,44 @@ def run_pi():
     fps             = 0.0
     last_alert_time = 0
     alert_flash     = 0
+    frame_count     = 0          # ← add this here
 
     try:
         while True:
+            frame_count += 1     # ← add this as first line in the loop
             frame_rgb = picam2.capture_array()
             frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
             frame = apply_zoom(frame)
 
-            results = model(frame, conf=CONFIDENCE, verbose=False)[0]
+            if frame_count % PROCESS_EVERY_N_FRAMES == 0:    # ← wrap inference
+                results = model(frame, conf=CONFIDENCE, verbose=False)[0]
 
-            display = frame.copy()
-            count   = 0
+                display = frame.copy()
+                count   = 0
 
-            for box in results.boxes:
-                conf     = float(box.conf[0])
-                class_id = int(box.cls[0])
-                label    = names[class_id]
-                draw_box(display, box, label, conf, class_id)
-                count   += 1
+                for box in results.boxes:
+                    conf     = float(box.conf[0])
+                    class_id = int(box.cls[0])
+                    label    = names[class_id]
+                    draw_box(display, box, label, conf, class_id)
+                    count   += 1
 
-                if label == ALERT_OBJECT:
-                    now = time.time()
-                    if now - last_alert_time > ALERT_COOLDOWN:
-                        send_alert(label)
-                        last_alert_time = now
-                        alert_flash     = now
+                    if label == ALERT_OBJECT:
+                        now = time.time()
+                        if now - last_alert_time > ALERT_COOLDOWN:
+                            send_alert(label)
+                            last_alert_time = now
+                            alert_flash     = now
+
+                alert_active = (time.time() - alert_flash) < 2
+                draw_hud(display, fps, count, alert_active)
+
+                with frame_lock:
+                    output_frame = display.copy()   # ← only update stream on processed frames
 
             now        = time.time()
             fps        = 1.0 / max(now - frame_time, 1e-6)
-            frame_time = now
-
-            alert_active = (time.time() - alert_flash) < 2
-            draw_hud(display, fps, count, alert_active)
-
-            with frame_lock:
-                output_frame = display.copy()
+            frame_time = now                        # ← fps always updates every frame
 
     except KeyboardInterrupt:
         print("\nStopped.")
