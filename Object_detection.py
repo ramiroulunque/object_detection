@@ -41,8 +41,8 @@ WINDOW_TITLE   = "Object Detection  |  Q = quit  S = screenshot  P = pause"
 ZOOM           = 1.5            # > 1 = zoom out (try 1.2 to 2.0)
 ALERT_OBJECT   = "bottle"       # Object that triggers the alert
 ALERT_COOLDOWN = 5              # Seconds between alerts (avoids spam)
-FRAME_WIDTH    = 640            # Reduced for Pi performance
-FRAME_HEIGHT   = 480
+FRAME_WIDTH    = 320            # Reduced for Pi performance
+FRAME_HEIGHT   = 240
 STREAM_PORT    = 5000           # Pi streaming port
 # ─────────────────────────────────────────────────────────────────────────────
 
