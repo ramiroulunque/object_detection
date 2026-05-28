@@ -36,7 +36,8 @@ from ultralytics import YOLO
 # ── Config ────────────────────────────────────────────────────────────────────
 CAMERA_INDEX   = 0              # Mac only: 0 = built-in camera
 CONFIDENCE     = 0.45           # Min confidence threshold (0–1)
-MODEL_NAME     = "yolov8n.pt"   # YOLOv8 nano model (auto-downloads)
+# MODEL_NAME     = "yolov8n.pt"   # YOLOv8 nano model (auto-downloads)
+MODEL_NAME     = "yolov8n_ncnn_model"
 WINDOW_TITLE   = "Object Detection  |  Q = quit  S = screenshot  P = pause"
 ZOOM           = 1.5            # > 1 = zoom out (try 1.2 to 2.0)
 ALERT_OBJECT   = "bottle"       # Object that triggers the alert
