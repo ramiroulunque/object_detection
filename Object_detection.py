@@ -197,7 +197,7 @@ def run_pi():
             frame = cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR)
             frame = apply_zoom(frame)
 
-            if frame_count % PROCESS_EVERY_N_FRAMES == 0:    # ← wrap inference
+            if frame_count % PROCESS_EVERY_N_FRAMES == 2:    # ← wrap inference
                 results = model(frame, conf=CONFIDENCE, verbose=False)[0]
 
                 display = frame.copy()
